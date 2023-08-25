@@ -1,0 +1,148 @@
+definitions:
+  controllers.LoginInput:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - password
+    - username
+    type: object
+  controllers.RegisterInput:
+    properties:
+      email:
+        type: string
+      image_url:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    required:
+    - email
+    - name
+    - password
+    - username
+    type: object
+  controllers.UpdatePasswordInput:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        type: string
+    required:
+    - new_password
+    - old_password
+    type: object
+info:
+  contact: {}
+paths:
+  /auth/login:
+    post:
+      description: login into blog to get access all blog list and CRUD blogs
+      parameters:
+      - description: json body to Login existing user
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.LoginInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Login using registered user.
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      description: registering a user to get access blog.
+      parameters:
+      - description: json body to register a user or create new user
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.RegisterInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Register new user or create new user.
+      tags:
+      - Auth
+  /auth/update-password:
+    patch:
+      description: Ability user to change their password.
+      parameters:
+      - description: json body to update current existing user
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UpdatePasswordInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update password for current user.
+      tags:
+      - Auth
+  /user:
+    get:
+      description: Get all users that have been registered except current user.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all User list.
+      tags:
+      - User
+    patch:
+      description: Update current user without update password that have logged in
+        into blog.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update current user.
+      tags:
+      - User
+  /user/{id}:
+    get:
+      description: login into blog to get all user detail
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get current user detail that have login
+      tags:
+      - User
+swagger: "2.0"
