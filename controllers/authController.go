@@ -16,7 +16,7 @@ type RegisterInput struct {
 	Email    string `json:"email" binding:"required"`
 	Password string `json:"password" binding:"required"`
 	ImageUrl string `json:"image_url"`
-	Role     uint   `json:"role"`
+	Role     uint   `json:"role" binding:"required"`
 }
 
 type LoginInput struct {
@@ -82,18 +82,19 @@ func LoginUser(ctx *gin.Context) {
 	}
 	token, err := models.LoginValid(inputLogin.Username, inputLogin.Password, db)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Registration success", "token": token})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Login success", "token": token})
 }
 
-// Register godoc
+// UpdatePassword godoc
 // @Summary Update password for current user.
 // @Description Ability user to change their password.
 // @Tags Auth
-// @Param Body body UpdatePasswordInput true "json body to update current existing user"
+// @Param Body body UpdatePasswordInput true "json body to update password for current existing user"
 // @Produce json
+// @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
 // @Success 200 {object} map[string]interface{}
 // @Router /login/update-password [patch]
 func UpdatePassword(ctx *gin.Context) {

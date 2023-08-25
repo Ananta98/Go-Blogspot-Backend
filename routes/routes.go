@@ -29,8 +29,19 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	UserRoute := r.Group("/user")
 	UserRoute.Use(middlewares.JwtAuthMiddleware())
-	UserRoute.GET("/", controllers.GetAllUsers)
+	UserRoute.GET("/", controllers.GetListUsers)
 	UserRoute.GET("/profile", controllers.GetCurrentUserProfile)
+
+	CategoryRoute := r.Group("/category")
+	CategoryRoute.POST("/", controllers.CreateNewCategory)
+	CategoryRoute.PATCH("/:id", controllers.UpdateCategory)
+	CategoryRoute.DELETE("/:id", controllers.DeleteCategory)
+	CategoryRoute.GET("/", controllers.GetListCategories)
+
+	PostRoute := r.Group("/post")
+	PostRoute.POST("/", controllers.CreateNewPost)
+	PostRoute.GET("/", controllers.GetListBlogs)
+	PostRoute.DELETE("/:id", controllers.DeletePost)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

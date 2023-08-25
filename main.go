@@ -4,23 +4,17 @@ import (
 	"blogspot-project/config"
 	"blogspot-project/docs"
 	"blogspot-project/routes"
-	"blogspot-project/utils"
 	"log"
 
 	"github.com/joho/godotenv"
 )
 
 func main() {
-	// for load godotenv
-	// for env
-	environment := utils.GetEnv("ENVIRONMENT", "development")
-
-	if environment == "development" {
-		err := godotenv.Load()
-		if err != nil {
-			log.Fatal("Error loading .env file")
-		}
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
 	}
+
 	// programmatically set swagger info
 	docs.SwaggerInfo.Title = "Swagger Blog API"
 	docs.SwaggerInfo.Description = "This is Sanbercode Project Blogspot Backend."

@@ -80,7 +80,178 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/update-password": {
+        "/category": {
+            "get": {
+                "description": "Get all categories.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Get all Category list.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization. How to input in swagger : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "create new category for post.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Create Category",
+                "parameters": [
+                    {
+                        "description": "json body to create new category",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.CategoryInput"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authorization. How to input in swagger : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/category/{id}": {
+            "delete": {
+                "description": "Delete existing category by id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Delete existing category.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Category id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "description": "Update existing category based on category id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Category"
+                ],
+                "summary": "Update Category.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Category id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "the body to update existing category",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.CategoryInput"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authorization. How to input in swagger : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/login/update-current-user": {
+            "patch": {
+                "description": "Update current user without update password that have logged in into blog.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Update current user.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization. How to input in swagger : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/login/update-password": {
             "patch": {
                 "description": "Ability user to change their password.",
                 "produces": [
@@ -92,13 +263,59 @@ const docTemplate = `{
                 "summary": "Update password for current user.",
                 "parameters": [
                     {
-                        "description": "json body to update current existing user",
+                        "description": "json body to update password for current existing user",
                         "name": "Body",
                         "in": "body",
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/controllers.UpdatePasswordInput"
                         }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authorization. How to input in swagger : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": true
+                        }
+                    }
+                }
+            }
+        },
+        "/post": {
+            "post": {
+                "description": "create new blog post.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Post"
+                ],
+                "summary": "Create Blog Post",
+                "parameters": [
+                    {
+                        "description": "json body to create new blog post",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.PostInput"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authorization. How to input in swagger : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -122,25 +339,33 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "Get all User list.",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "type": "object",
-                            "additionalProperties": true
-                        }
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization. How to input in swagger : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "current_page",
+                        "name": "current_page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "page_size",
+                        "name": "page_size",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "input_search",
+                        "name": "input_search",
+                        "in": "query"
                     }
-                }
-            },
-            "patch": {
-                "description": "Update current user without update password that have logged in into blog.",
-                "produces": [
-                    "application/json"
                 ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Update current user.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -162,6 +387,15 @@ const docTemplate = `{
                     "User"
                 ],
                 "summary": "Get current user detail that have login",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Authorization. How to input in swagger : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -175,6 +409,14 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "controllers.CategoryInput": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "controllers.LoginInput": {
             "type": "object",
             "required": [
@@ -190,12 +432,36 @@ const docTemplate = `{
                 }
             }
         },
+        "controllers.PostInput": {
+            "type": "object",
+            "required": [
+                "article_content",
+                "article_description",
+                "article_title",
+                "category_id"
+            ],
+            "properties": {
+                "article_content": {
+                    "type": "string"
+                },
+                "article_description": {
+                    "type": "string"
+                },
+                "article_title": {
+                    "type": "string"
+                },
+                "category_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "controllers.RegisterInput": {
             "type": "object",
             "required": [
                 "email",
                 "name",
                 "password",
+                "role",
                 "username"
             ],
             "properties": {
@@ -210,6 +476,9 @@ const docTemplate = `{
                 },
                 "password": {
                     "type": "string"
+                },
+                "role": {
+                    "type": "integer"
                 },
                 "username": {
                     "type": "string"

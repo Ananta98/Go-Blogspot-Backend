@@ -1,4 +1,9 @@
 definitions:
+  controllers.CategoryInput:
+    properties:
+      name:
+        type: string
+    type: object
   controllers.LoginInput:
     properties:
       password:
@@ -8,6 +13,22 @@ definitions:
     required:
     - password
     - username
+    type: object
+  controllers.PostInput:
+    properties:
+      article_content:
+        type: string
+      article_description:
+        type: string
+      article_title:
+        type: string
+      category_id:
+        type: integer
+    required:
+    - article_content
+    - article_description
+    - article_title
+    - category_id
     type: object
   controllers.RegisterInput:
     properties:
@@ -19,12 +40,15 @@ definitions:
         type: string
       password:
         type: string
+      role:
+        type: integer
       username:
         type: string
     required:
     - email
     - name
     - password
+    - role
     - username
     type: object
   controllers.UpdatePasswordInput:
@@ -82,16 +106,40 @@ paths:
       summary: Register new user or create new user.
       tags:
       - Auth
-  /auth/update-password:
-    patch:
-      description: Ability user to change their password.
+  /category:
+    get:
+      description: Get all categories.
       parameters:
-      - description: json body to update current existing user
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all Category list.
+      tags:
+      - Category
+    post:
+      description: create new category for post.
+      parameters:
+      - description: json body to create new category
         in: body
         name: Body
         required: true
         schema:
-          $ref: '#/definitions/controllers.UpdatePasswordInput'
+          $ref: '#/definitions/controllers.CategoryInput'
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -100,12 +148,18 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Update password for current user.
+      summary: Create Category
       tags:
-      - Auth
-  /user:
-    get:
-      description: Get all users that have been registered except current user.
+      - Category
+  /category/{id}:
+    delete:
+      description: Delete existing category by id.
+      parameters:
+      - description: Category id
+        in: path
+        name: id
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -114,12 +168,49 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Get all User list.
+      summary: Delete existing category.
       tags:
-      - User
+      - Category
+    patch:
+      description: Update existing category based on category id.
+      parameters:
+      - description: Category id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: the body to update existing category
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.CategoryInput'
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update Category.
+      tags:
+      - Category
+  /login/update-current-user:
     patch:
       description: Update current user without update password that have logged in
         into blog.
+      parameters:
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -131,9 +222,99 @@ paths:
       summary: Update current user.
       tags:
       - User
+  /login/update-password:
+    patch:
+      description: Ability user to change their password.
+      parameters:
+      - description: json body to update password for current existing user
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UpdatePasswordInput'
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update password for current user.
+      tags:
+      - Auth
+  /post:
+    post:
+      description: create new blog post.
+      parameters:
+      - description: json body to create new blog post
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.PostInput'
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create Blog Post
+      tags:
+      - Post
+  /user:
+    get:
+      description: Get all users that have been registered except current user.
+      parameters:
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: current_page
+        in: query
+        name: current_page
+        type: integer
+      - description: page_size
+        in: query
+        name: page_size
+        type: integer
+      - description: input_search
+        in: query
+        name: input_search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all User list.
+      tags:
+      - User
   /user/{id}:
     get:
       description: login into blog to get all user detail
+      parameters:
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
       produces:
       - application/json
       responses:

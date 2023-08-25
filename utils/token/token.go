@@ -20,7 +20,7 @@ func GetTokenString(c *gin.Context) string {
 	}
 	header := c.Request.Header.Get("Authorization")
 	splitted := strings.Split(header, " ")
-	if len(splitted) > 2 {
+	if len(splitted) == 2 {
 		return splitted[1]
 	}
 	return ""
@@ -32,11 +32,11 @@ func GenerateToken(user_id uint) (string, error) {
 		return "", err
 	}
 	claims := jwt.MapClaims{}
-	claims["user_id"] = user_id
 	claims["authorized"] = true
+	claims["user_id"] = user_id
 	claims["exp"] = time.Now().Add(time.Duration(token_lifespan) * time.Hour).Unix()
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	return token.SigningString()
+	return token.SignedString([]byte(API_SECRET))
 }
 
 func TokenValid(c *gin.Context) error {
