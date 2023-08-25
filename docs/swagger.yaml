@@ -425,7 +425,7 @@ paths:
       summary: Get all comments list.
       tags:
       - Comment
-  /post/{post_id}/comment/{comment_id}:
+  /post/{id}/comment/{comment_id}:
     delete:
       description: Delete existing comment in blog post by post id.
       parameters:

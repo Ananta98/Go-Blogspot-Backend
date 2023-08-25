@@ -68,24 +68,26 @@ func CreateNewComment(ctx *gin.Context) {
 // @Param Body body UpdateCommentInput true "json body to update existing comment in existing post"
 // @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
 // @Success 200 {object} map[string]interface{}
-// @Router /post/{post_id}/comment/{comment_id} [patch]
+// @Router /post/{id}/comment/{comment_id} [patch]
 func UpdateComment(ctx *gin.Context) {
 	db := ctx.MustGet("db").(*gorm.DB)
-	var input InputComment
+	var input UpdateCommentInput
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	var oldComment models.Comment
-	if err := db.Where("post_id = ? and comment_id = ?", ctx.Param("id"), ctx.Param("comment_id")).Take(&oldComment).Error; err != nil {
+	if err := db.Where("post_id = ? and id = ?", ctx.Param("id"), ctx.Param("comment_id")).Take(&oldComment).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	updatedCommentInput := models.Comment{
+		UserID:         oldComment.UserID,
+		PostID:         oldComment.PostID,
 		CommentContent: input.CommentContent,
 	}
 	updatedComment := models.Comment{}
-	if err := db.Model(&oldComment).Updates(&updatedCommentInput).Take(&updatedComment).Error; err != nil {
+	if err := db.Model(&oldComment).Updates(&updatedCommentInput).Last(&updatedComment).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -101,11 +103,11 @@ func UpdateComment(ctx *gin.Context) {
 // @Param comment_id path string true "Comment id"
 // @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
 // @Success 200 {object} map[string]interface{}
-// @Router /post/{post_id}/comment/{comment_id} [delete]
+// @Router /post/{id}/comment/{comment_id} [delete]
 func DeleteComment(ctx *gin.Context) {
 	db := ctx.MustGet("db").(*gorm.DB)
 	var comment models.Comment
-	if err := db.Where("post_id = ? and comment_id = ?", ctx.Param("id"), ctx.Param("comment_id")).Take(&comment).Error; err != nil {
+	if err := db.Where("post_id = ? and id = ?", ctx.Param("id"), ctx.Param("comment_id")).Take(&comment).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -127,16 +129,16 @@ func DeleteComment(ctx *gin.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Router /post/{id}/comment/ [get]
 func GetListComments(ctx *gin.Context) {
-	var categories []models.Category
+	var comments []models.Comment
 	db := ctx.MustGet("db").(*gorm.DB)
 	limit, offset, err := utils.GetPagination(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if err := db.Where("name LIKE ?", "%"+ctx.Query("input_search")+"%").Limit(limit).Offset(offset).Find(&categories).Error; err != nil {
+	if err := db.Where("comment_content LIKE ?", "%"+ctx.Query("input_search")+"%").Limit(limit).Offset(offset).Find(&comments).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Get list category success", "data": categories})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Get list category success", "data": comments})
 }
