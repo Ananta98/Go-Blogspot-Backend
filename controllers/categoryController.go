@@ -32,7 +32,7 @@ func CreateNewCategory(ctx *gin.Context) {
 		Name: input.Name,
 	}
 	var createdCategory models.Category
-	if err := db.Create(&newCategory).Find(&createdCategory).Error; err != nil {
+	if err := db.Create(&newCategory).Last(&createdCategory).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
@@ -78,6 +78,7 @@ func UpdateCategory(ctx *gin.Context) {
 // @Tags Category
 // @Produce json
 // @Param id path string true "Category id"
+// @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
 // @Success 200 {object} map[string]interface{}
 // @Router /category/{id} [delete]
 func DeleteCategory(ctx *gin.Context) {
@@ -100,12 +101,13 @@ func DeleteCategory(ctx *gin.Context) {
 // @Tags Category
 // @Produce json
 // @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
+// @Param   input_search      query    string     false        "input text for search category"
 // @Success 200 {object} map[string]interface{}
 // @Router /category [get]
 func GetListCategories(ctx *gin.Context) {
 	var categories []models.Category
 	db := ctx.MustGet("db").(*gorm.DB)
-	if err := db.Find(&categories).Error; err != nil {
+	if err := db.Where("name LIKE ?", "%"+ctx.Query("input_search")+"%").Find(&categories).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}

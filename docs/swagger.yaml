@@ -4,6 +4,16 @@ definitions:
       name:
         type: string
     type: object
+  controllers.InputComment:
+    properties:
+      comment_content:
+        type: string
+      post_id:
+        type: integer
+    required:
+    - comment_content
+    - post_id
+    type: object
   controllers.LoginInput:
     properties:
       password:
@@ -45,11 +55,17 @@ definitions:
       username:
         type: string
     required:
-    - email
     - name
     - password
     - role
     - username
+    type: object
+  controllers.UpdateCommentInput:
+    properties:
+      comment_content:
+        type: string
+    required:
+    - comment_content
     type: object
   controllers.UpdatePasswordInput:
     properties:
@@ -115,6 +131,10 @@ paths:
         name: Authorization
         required: true
         type: string
+      - description: input text for search category
+        in: query
+        name: input_search
+        type: string
       produces:
       - application/json
       responses:
@@ -158,6 +178,11 @@ paths:
       - description: Category id
         in: path
         name: id
+        required: true
+        type: string
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
         required: true
         type: string
       produces:
@@ -249,6 +274,29 @@ paths:
       tags:
       - Auth
   /post:
+    get:
+      description: Get all categories.
+      parameters:
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: input text for search blog
+        in: query
+        name: input_search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all Blog Post list.
+      tags:
+      - Post
     post:
       description: create new blog post.
       parameters:
@@ -274,6 +322,201 @@ paths:
       summary: Create Blog Post
       tags:
       - Post
+  /post/{id}:
+    delete:
+      description: Delete existing blog post by id.
+      parameters:
+      - description: Post id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete existing blog post.
+      tags:
+      - Post
+    get:
+      description: Get post detail based on post id
+      parameters:
+      - description: Post id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get detail post by id
+      tags:
+      - Post
+    patch:
+      description: Update existing post without update password that have logged in
+        into blog.
+      parameters:
+      - description: Post id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update existing post.
+      tags:
+      - Post
+  /post/{id}/comment/:
+    get:
+      description: Get all comments based on post id.
+      parameters:
+      - description: Post id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: input text for search comment
+        in: query
+        name: input_search
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Get all comments list.
+      tags:
+      - Comment
+  /post/{post_id}/comment/{comment_id}:
+    delete:
+      description: Delete existing comment in blog post by post id.
+      parameters:
+      - description: Post id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Comment id
+        in: path
+        name: comment_id
+        required: true
+        type: string
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete existing comment blog post.
+      tags:
+      - Comment
+    patch:
+      description: Update existing comment blog post based on comment id and post
+        id.
+      parameters:
+      - description: Post id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Comment id
+        in: path
+        name: comment_id
+        required: true
+        type: string
+      - description: json body to update existing comment in existing post
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UpdateCommentInput'
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Update existing comment.
+      tags:
+      - Comment
+  /post/comment:
+    post:
+      description: create new comment blog post based on post id.
+      parameters:
+      - description: json body to create new comment post
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.InputComment'
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Create Comment Blog Post from post id.
+      tags:
+      - Comment
   /user:
     get:
       description: Get all users that have been registered except current user.
@@ -283,15 +526,15 @@ paths:
         name: Authorization
         required: true
         type: string
-      - description: current_page
+      - description: current page for pagination
         in: query
         name: current_page
         type: integer
-      - description: page_size
+      - description: page size for pagination
         in: query
         name: page_size
         type: integer
-      - description: input_search
+      - description: input text for search category
         in: query
         name: input_search
         type: string
@@ -307,6 +550,30 @@ paths:
       tags:
       - User
   /user/{id}:
+    delete:
+      description: Delete existing user by id.
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Delete existing user.
+      tags:
+      - User
     get:
       description: login into blog to get all user detail
       parameters:

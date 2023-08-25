@@ -16,7 +16,7 @@ type User struct {
 	Email    string `gorm:"size:255;not null;unique" json:"email"`
 	Password string `gorm:"size:255;not null" json:"-"`
 	ImageUrl string `gorm:"size:255;" json:"image_url"`
-	Role     uint   `gorm:"not null;default:2"`
+	Role     uint   `gorm:"not null;default:2" json:"role"`
 
 	// Relationship
 	Posts               []Post            `json:"-"`
@@ -26,8 +26,7 @@ type User struct {
 }
 
 const ADMIN_USER_ROLE = 1
-const BLOGGER_USER_ROLE = 2
-const READER_USER_ROLE = 3
+const NON_ADMIN_USER_ROLE = 2
 
 func VerifyPassword(password, hashedPassword string) error {
 	return bcrypt.CompareHashAndPassword([]byte(hashedPassword), []byte(password))

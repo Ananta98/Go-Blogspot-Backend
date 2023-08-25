@@ -3,6 +3,7 @@ package controllers
 import (
 	"blogspot-project/models"
 	"blogspot-project/utils"
+	"blogspot-project/utils/token"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,6 +15,13 @@ type PostInput struct {
 	ArticleDescription string `binding:"required" json:"article_description"`
 	CategoryID         uint   `binding:"required" json:"category_id"`
 	ArticleContent     string `binding:"required" json:"article_content"`
+}
+
+type PostUpdate struct {
+	ArticleTitle       string `json:"article_title"`
+	ArticleDescription string `json:"article_description"`
+	CategoryID         uint   `json:"category_id"`
+	ArticleContent     string `json:"article_content"`
 }
 
 // CreateNewPost godoc
@@ -33,32 +41,39 @@ func CreateNewPost(ctx *gin.Context) {
 		return
 	}
 	var category models.Category
-	if err := db.Where("category_id = ?", input.CategoryID).Take(&category).Error; err != nil {
+	if err := db.Table("categories").Where("id = ?", input.CategoryID).Take(&category).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	user_id, err := token.ExtractTokenID(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
 	newCategory := models.Post{
+		UserID:             user_id,
 		ArticleTitle:       input.ArticleTitle,
 		ArticleDescription: input.ArticleDescription,
 		CategoryID:         category.ID,
 		ArticleContent:     input.ArticleContent,
 	}
-	var createdCategory models.Category
-	if err := db.Create(&newCategory).Find(&createdCategory).Error; err != nil {
+	var createdPost models.Post
+	if err := db.Create(&newCategory).Last(&createdPost).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Create New Category Success", "data": createdCategory})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Create New blog Success", "data": createdPost})
 }
 
-// DeleteCategory godoc
+// DeletePost godoc
 // @Summary Delete existing blog post.
 // @Description Delete existing blog post by id.
 // @Tags Post
 // @Produce json
 // @Param id path string true "Post id"
+// @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
 // @Success 200 {object} map[string]interface{}
-// @Router /category/{id} [delete]
+// @Router /post/{id} [delete]
 func DeletePost(ctx *gin.Context) {
 	db := ctx.MustGet("db").(*gorm.DB)
 	var post models.Post
@@ -70,19 +85,60 @@ func DeletePost(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Delete Category Success"})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Delete blog Success"})
 }
 
+// UpdatePost godoc
+// @Summary Update existing post.
+// @Description Update existing post without update password that have logged in into blog.
+// @Tags Post
+// @Produce json
+// @Param id path string true "Post id"
+// @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
+// @Success 200 {object} map[string]interface{}
+// @Router /post/{id} [patch]
 func UpdatePost(ctx *gin.Context) {
-
+	db := ctx.MustGet("db").(*gorm.DB)
+	user_id, err := token.ExtractTokenID(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	oldPost := models.Post{}
+	if err := db.Where("id = ? AND user_id = ?", ctx.Param("id"), user_id).Take(&oldPost).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	var input PostUpdate
+	if err := ctx.BindJSON(&input); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	var category models.Category
+	if err := db.Table("categories").Where("id = ?", input.CategoryID).Take(&category).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	updatedPost := models.Post{
+		ArticleTitle:       input.ArticleTitle,
+		ArticleContent:     input.ArticleContent,
+		ArticleDescription: input.ArticleDescription,
+		CategoryID:         input.CategoryID,
+	}
+	if err := db.Model(&oldPost).Updates(&updatedPost).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "Success update blog", "data": updatedPost})
 }
 
 // GetListBlogs godoc
 // @Summary Get all Blog Post list.
 // @Description Get all categories.
-// @Tags Category
+// @Tags Post
 // @Produce json
 // @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
+// @Param   input_search      query    string     false        "input text for search blog"
 // @Success 200 {object} map[string]interface{}
 // @Router /post [get]
 func GetListBlogs(ctx *gin.Context) {
@@ -93,9 +149,33 @@ func GetListBlogs(ctx *gin.Context) {
 		return
 	}
 	var blogs []models.Post
-	if err := db.Find(&blogs).Limit(limit).Offset(offset).Error; err != nil {
+	if err := db.Where("article_title LIKE ?", "%"+ctx.Query("input_search")+"%").Limit(limit).Offset(offset).Find(&blogs).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Get list category success", "data": blogs})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Get list blog success", "data": blogs})
+}
+
+// GetDetailPost godoc
+// @Summary Get detail post by id
+// @Description Get post detail based on post id
+// @Tags Post
+// @Produce json
+// @Param id path string true "Post id"
+// @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
+// @Success 200 {object} map[string]interface{}
+// @Router /post/{id} [get]
+func GetDetailPost(ctx *gin.Context) {
+	u := models.User{}
+	db := ctx.MustGet("db").(*gorm.DB)
+	id, err := token.ExtractTokenID(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+	if err := db.Where("id = ?", id).Take(&u).Error; err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "Get blog detail success", "data": u})
 }
