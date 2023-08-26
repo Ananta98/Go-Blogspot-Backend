@@ -32,5 +32,5 @@ func main() {
 
 	// route setup
 	r := routes.SetupRouter(db)
-	r.Run("localhost:8080")
+	r.Run()
 }
