@@ -25,6 +25,13 @@ type User struct {
 	UserListLikeComment []UserLikeComment `json:"-"`
 }
 
+type UserResponse struct {
+	Name     string `gorm:"size:255;not null;unique" json:"name"`
+	Username string `gorm:"size:255;not null;unique" json:"username"`
+	Email    string `gorm:"size:255;not null;unique" json:"email"`
+	ImageUrl string `gorm:"size:255;" json:"image_url"`
+}
+
 const ADMIN_USER_ROLE = 1
 const NON_ADMIN_USER_ROLE = 2
 

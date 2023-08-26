@@ -42,15 +42,29 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	PostRoute := r.Group("/post")
 	PostRoute.Use(middlewares.JwtAuthMiddleware())
+
+	//posts api section
 	PostRoute.POST("/", controllers.CreateNewPost)
 	PostRoute.GET("/", controllers.GetListBlogs)
 	PostRoute.DELETE("/:id", controllers.DeletePost)
 	PostRoute.PATCH("/:id", controllers.UpdatePost)
 	PostRoute.GET("/:id", controllers.GetDetailPost)
+
+	//comments api section
 	PostRoute.POST("/comment", controllers.CreateNewComment)
 	PostRoute.PATCH("/:id/comment/:comment_id", controllers.UpdateComment)
 	PostRoute.DELETE("/:id/comment/:comment_id", controllers.DeleteComment)
 	PostRoute.GET("/:id/comment", controllers.GetListComments)
+
+	//user like post api section
+	PostRoute.POST("/:id/like/:status", controllers.LikePostController)
+	PostRoute.GET("/:id/user-likes/", controllers.GetListUserLikePost)
+	PostRoute.GET("/:id/user-dislikes/", controllers.GetListUserDislikePost)
+
+	//user like comment post api section
+	PostRoute.POST("/comment/:id/like/:status", controllers.LikeCommentController)
+	PostRoute.GET("/comment/:id/user-likes/", controllers.GetListUserLikePost)
+	PostRoute.GET("/comment/:id/user-dislikes/", controllers.GetListUserDislikePost)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

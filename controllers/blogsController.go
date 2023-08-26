@@ -166,16 +166,16 @@ func GetListBlogs(ctx *gin.Context) {
 // @Success 200 {object} map[string]interface{}
 // @Router /post/{id} [get]
 func GetDetailPost(ctx *gin.Context) {
-	u := models.User{}
+	post := models.Post{}
 	db := ctx.MustGet("db").(*gorm.DB)
 	id, err := token.ExtractTokenID(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
-	if err := db.Where("id = ?", id).Take(&u).Error; err != nil {
+	if err := db.Where("id = ?", id).Take(&post).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Get blog detail success", "data": u})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Get blog detail success", "data": post})
 }

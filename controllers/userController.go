@@ -18,8 +18,8 @@ type UpdateUserInput struct {
 }
 
 // GetCurrentUserProfile godoc
-// @Summary Get current user detail that have login
-// @Description login into blog to get all user detail
+// @Summary Get current user profile that have login
+// @Description login into blog to get current user profile
 // @Tags User
 // @Produce json
 // @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
@@ -85,6 +85,7 @@ func GetListUsers(ctx *gin.Context) {
 // @Description Update current user without update password that have logged in into blog.
 // @Tags User
 // @Produce json
+// @Param Body body UpdateUserInput true "json body to update user profile for current existing user"
 // @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
 // @Success 200 {object} map[string]interface{}
 // @Router /login/update-current-user [patch]

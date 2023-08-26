@@ -87,7 +87,7 @@ func UpdateComment(ctx *gin.Context) {
 		CommentContent: input.CommentContent,
 	}
 	updatedComment := models.Comment{}
-	if err := db.Model(&oldComment).Updates(&updatedCommentInput).Last(&updatedComment).Error; err != nil {
+	if err := db.Model(&oldComment).Updates(&updatedCommentInput).Take(&updatedComment).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
