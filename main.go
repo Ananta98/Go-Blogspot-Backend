@@ -4,7 +4,6 @@ import (
 	"blogspot-project/config"
 	"blogspot-project/docs"
 	"blogspot-project/routes"
-	"blogspot-project/utils"
 	"log"
 
 	"github.com/joho/godotenv"
@@ -17,10 +16,8 @@ func main() {
 	}
 	// programmatically set swagger info
 	docs.SwaggerInfo.Title = "Swagger Blog API"
-	docs.SwaggerInfo.Description = "This is Sanbercode Project Blogspot Backend."
+	docs.SwaggerInfo.Description = "This is Golang Backend Project Blogspot."
 	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Host = utils.GetEnv("SWAGGER_HOST", "localhost:8080")
-	docs.SwaggerInfo.Schemes = []string{"http", "https"}
 
 	// database connection setup
 	db := config.ConnectDatabase()
