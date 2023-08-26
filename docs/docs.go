@@ -794,7 +794,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "LikePost"
+                    "Like"
                 ],
                 "summary": "Create Category",
                 "parameters": [
@@ -838,7 +838,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Post"
+                    "Like"
                 ],
                 "summary": "Get all User dislike blog.",
                 "parameters": [

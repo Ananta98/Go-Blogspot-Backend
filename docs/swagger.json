@@ -782,7 +782,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "LikePost"
+                    "Like"
                 ],
                 "summary": "Create Category",
                 "parameters": [
@@ -826,7 +826,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "Post"
+                    "Like"
                 ],
                 "summary": "Get all User dislike blog.",
                 "parameters": [

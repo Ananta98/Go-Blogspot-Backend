@@ -537,7 +537,7 @@ paths:
             type: object
       summary: Create Category
       tags:
-      - LikePost
+      - Like
   /post/{id}/user-dislikes:
     get:
       description: Get all users who dislikes in blog post based on id.
@@ -562,7 +562,7 @@ paths:
             type: object
       summary: Get all User dislike blog.
       tags:
-      - Post
+      - Like
   /post/{id}/user-likes:
     get:
       description: Get all users who likes comment in blog post based on id.

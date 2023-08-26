@@ -16,7 +16,7 @@ const STATUS_LIKE = 1
 // LikePostController godoc
 // @Summary Create Category
 // @Description create new category for post.
-// @Tags LikePost
+// @Tags Like
 // @Param id path string true "Post id"
 // @Param status path string true "status 0/1 (dislike or like)"
 // @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
@@ -132,7 +132,7 @@ func GetListUserLikePost(ctx *gin.Context) {
 // GetListUserDislikePost godoc
 // @Summary Get all User dislike blog.
 // @Description Get all users who dislikes in blog post based on id.
-// @Tags Post
+// @Tags Like
 // @Produce json
 // @Param id path string true "Post id"
 // @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
