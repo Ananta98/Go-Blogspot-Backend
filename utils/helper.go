@@ -1,6 +1,8 @@
 package utils
 
 import (
+	"net/mail"
+	"net/url"
 	"os"
 	"strconv"
 
@@ -36,4 +38,20 @@ func GetPagination(ctx *gin.Context) (int, int, error) {
 		offset = (current_page_int - 1) * limit
 	}
 	return limit, offset, nil
+}
+
+func IsValidUrl(str string) bool {
+	_, err := url.ParseRequestURI(str)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func IsValidEmail(str string) bool {
+	_, err := mail.ParseAddress(str)
+	if err != nil {
+		return false
+	}
+	return true
 }

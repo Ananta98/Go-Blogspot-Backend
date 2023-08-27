@@ -106,6 +106,14 @@ func UpdateCurrentUser(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
+	if !utils.IsValidEmail(input.Email) {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email (make sure email format correct)"})
+		return
+	}
+	if !utils.IsValidUrl(input.ImageUrl) {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid image url (make sure image url format correct)"})
+		return
+	}
 	updatedUser := models.User{
 		Name:     input.Name,
 		Username: input.Username,

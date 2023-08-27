@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"blogspot-project/models"
+	"blogspot-project/utils"
 	"blogspot-project/utils/token"
 	"net/http"
 
@@ -30,7 +31,7 @@ type UpdatePasswordInput struct {
 }
 
 // Register godoc
-// @Summary Register new user or create new user.
+// @Summary Register new user or create new user (role 1 for admin, role 2 for non admin).
 // @Description registering a user to get access blog.
 // @Tags Auth
 // @Param Body body RegisterInput true "json body to register a user or create new user"
@@ -42,6 +43,17 @@ func RegisterNewUser(ctx *gin.Context) {
 	var inputRegister RegisterInput
 	if err := ctx.ShouldBindJSON(&inputRegister); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if inputRegister.Role == 0 {
+		inputRegister.Role = models.NON_ADMIN_USER_ROLE
+	}
+	if !utils.IsValidEmail(inputRegister.Email) {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid email (make sure email format correct)"})
+		return
+	}
+	if !utils.IsValidUrl(inputRegister.ImageUrl) {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": "Invalid image url (make sure image url format correct)"})
 		return
 	}
 	newUser := models.User{

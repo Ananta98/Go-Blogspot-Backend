@@ -131,7 +131,8 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Register new user or create new user.
+      summary: Register new user or create new user (role 1 for admin, role 2 for
+        non admin).
       tags:
       - Auth
   /category:

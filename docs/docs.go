@@ -57,7 +57,7 @@ const docTemplate = `{
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Register new user or create new user.",
+                "summary": "Register new user or create new user (role 1 for admin, role 2 for non admin).",
                 "parameters": [
                     {
                         "description": "json body to register a user or create new user",

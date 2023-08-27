@@ -35,34 +35,48 @@ type PostUpdate struct {
 // @Router /post [post]
 func CreateNewPost(ctx *gin.Context) {
 	db := ctx.MustGet("db").(*gorm.DB)
-	var input PostInput
-	if err := ctx.ShouldBindJSON(&input); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	var category models.Category
-	if err := db.Table("categories").Where("id = ?", input.CategoryID).Take(&category).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	user_id, err := token.ExtractTokenID(ctx)
+	id, err := token.ExtractTokenID(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		return
 	}
-	newCategory := models.Post{
-		UserID:             user_id,
-		ArticleTitle:       input.ArticleTitle,
-		ArticleDescription: input.ArticleDescription,
-		CategoryID:         category.ID,
-		ArticleContent:     input.ArticleContent,
-	}
-	var createdPost models.Post
-	if err := db.Create(&newCategory).Last(&createdPost).Error; err != nil {
+	currentUser := models.User{}
+	if err := db.Where("id = ?", id).Take(&currentUser).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Create New blog Success", "data": createdPost})
+	if currentUser.Role == models.ADMIN_USER_ROLE {
+		var input PostInput
+		if err := ctx.ShouldBindJSON(&input); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		var category models.Category
+		if err := db.Table("categories").Where("id = ?", input.CategoryID).Take(&category).Error; err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		user_id, err := token.ExtractTokenID(ctx)
+		if err != nil {
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+			return
+		}
+		newCategory := models.Post{
+			UserID:             user_id,
+			ArticleTitle:       input.ArticleTitle,
+			ArticleDescription: input.ArticleDescription,
+			CategoryID:         category.ID,
+			ArticleContent:     input.ArticleContent,
+		}
+		var createdPost models.Post
+		if err := db.Create(&newCategory).Last(&createdPost).Error; err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusOK, gin.H{"message": "Create New blog Success", "data": createdPost})
+		return
+	}
+	ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Only Admin can create new post"})
 }
 
 // DeletePost godoc
@@ -76,16 +90,30 @@ func CreateNewPost(ctx *gin.Context) {
 // @Router /post/{id} [delete]
 func DeletePost(ctx *gin.Context) {
 	db := ctx.MustGet("db").(*gorm.DB)
-	var post models.Post
-	if err := db.Where("id = ?", ctx.Param("id")).Take(&post).Error; err != nil {
+	id, err := token.ExtractTokenID(ctx)
+	if err != nil {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+	currentUser := models.User{}
+	if err := db.Where("id = ?", id).Take(&currentUser).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	if err := db.Delete(&post).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if currentUser.Role == models.ADMIN_USER_ROLE {
+		var post models.Post
+		if err := db.Where("id = ?", ctx.Param("id")).Take(&post).Error; err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		if err := db.Delete(&post).Error; err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusOK, gin.H{"message": "Delete blog Success"})
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Delete blog Success"})
+	ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Only Admin can delete post"})
 }
 
 // UpdatePost godoc
@@ -104,32 +132,41 @@ func UpdatePost(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	oldPost := models.Post{}
-	if err := db.Where("id = ? AND user_id = ?", ctx.Param("id"), user_id).Take(&oldPost).Error; err != nil {
+	currentUser := models.User{}
+	if err := db.Where("id = ?", user_id).Take(&currentUser).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	var input PostUpdate
-	if err := ctx.BindJSON(&input); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if currentUser.Role == models.ADMIN_USER_ROLE {
+		oldPost := models.Post{}
+		if err := db.Where("id = ? AND user_id = ?", ctx.Param("id"), user_id).Take(&oldPost).Error; err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		var input PostUpdate
+		if err := ctx.BindJSON(&input); err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		var category models.Category
+		if err := db.Table("categories").Where("id = ?", input.CategoryID).Take(&category).Error; err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		updatedPost := models.Post{
+			ArticleTitle:       input.ArticleTitle,
+			ArticleContent:     input.ArticleContent,
+			ArticleDescription: input.ArticleDescription,
+			CategoryID:         input.CategoryID,
+		}
+		if err := db.Model(&oldPost).Updates(&updatedPost).Error; err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusOK, gin.H{"message": "Success update blog", "data": updatedPost})
 		return
 	}
-	var category models.Category
-	if err := db.Table("categories").Where("id = ?", input.CategoryID).Take(&category).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	updatedPost := models.Post{
-		ArticleTitle:       input.ArticleTitle,
-		ArticleContent:     input.ArticleContent,
-		ArticleDescription: input.ArticleDescription,
-		CategoryID:         input.CategoryID,
-	}
-	if err := db.Model(&oldPost).Updates(&updatedPost).Error; err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Success update blog", "data": updatedPost})
+	ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Only Admin can update post"})
 }
 
 // GetListBlogs godoc
