@@ -14,7 +14,7 @@ import (
 // @Summary Like comment
 // @Description like comment in existing post.
 // @Tags Like
-// @Param id path string true "LikeComment id"
+// @Param id path string true "Comment id"
 // @Param status path string true "status 0/1 (dislike or like)"
 // @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
 // @Produce json
@@ -96,7 +96,7 @@ func LikeCommentController(ctx *gin.Context) {
 // GetListUserLikeComment godoc
 // @Summary Get all User likes based on comment blog post id.
 // @Description Get all users who likes comment in blog post based on id.
-// @Tags Comment
+// @Tags Like
 // @Produce json
 // @Param id path string true "Comment id"
 // @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
@@ -104,15 +104,15 @@ func LikeCommentController(ctx *gin.Context) {
 // @Router /post/comment/{id}/user-likes [get]
 func GetListUserLikeComment(ctx *gin.Context) {
 	db := ctx.MustGet("db").(*gorm.DB)
-	userLikePost := []models.UserLikePost{}
-	if err := db.Where("post_id = ? and status = ?", ctx.Param("id"), STATUS_LIKE).Find(&userLikePost).Error; err != nil {
+	userLikeComment := []models.UserLikeComment{}
+	if err := db.Table("user_like_comments").Where("comment_id = ? and status = ?", ctx.Param("id"), STATUS_LIKE).Find(&userLikeComment).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	listOfUsers := []models.UserResponse{}
-	for _, item := range userLikePost {
+	for _, item := range userLikeComment {
 		user := models.User{}
-		if err := db.Table("users").Where("id = ?", ctx.Param("id"), item.UserID).Find(&user).Error; err != nil {
+		if err := db.Table("users").Where("id = ?", item.UserID).Find(&user).Error; err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -127,25 +127,25 @@ func GetListUserLikeComment(ctx *gin.Context) {
 }
 
 // GetListUserDislikeComment godoc
-// @Summary Get all User dislike blog.
+// @Summary Get all User dislike comment blog.
 // @Description Get all users who dislikes comment in blog post based on id.
-// @Tags Comment
+// @Tags Like
 // @Produce json
-// @Param id path string true "Post id"
+// @Param id path string true "Comment id"
 // @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
 // @Success 200 {object} map[string]interface{}
 // @Router /post/comment/{id}/user-dislikes [get]
 func GetListUserDislikeComment(ctx *gin.Context) {
 	db := ctx.MustGet("db").(*gorm.DB)
-	userLikePost := []models.UserLikePost{}
-	if err := db.Where("post_id = ? and status = ?", ctx.Param("id"), STATUS_DISLIKE).Find(&userLikePost).Error; err != nil {
+	userLikeComment := []models.UserLikeComment{}
+	if err := db.Table("user_like_comments").Where("comment_id = ? and status = ?", ctx.Param("id"), STATUS_DISLIKE).Find(&userLikeComment).Error; err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 	listOfUsers := []models.UserResponse{}
-	for _, item := range userLikePost {
+	for _, item := range userLikeComment {
 		user := models.User{}
-		if err := db.Table("users").Where("id = ?", ctx.Param("id"), item.UserID).Find(&user).Error; err != nil {
+		if err := db.Table("users").Where("id = ?", item.UserID).Find(&user).Error; err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -156,5 +156,5 @@ func GetListUserDislikeComment(ctx *gin.Context) {
 			ImageUrl: user.ImageUrl,
 		})
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Success get all user dislikea blog post", "data": listOfUsers})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Success get all user dislike comment blog post", "data": listOfUsers})
 }

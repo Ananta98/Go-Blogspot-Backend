@@ -14,8 +14,8 @@ const STATUS_DISLIKE = 0
 const STATUS_LIKE = 1
 
 // LikePostController godoc
-// @Summary Create Category
-// @Description create new category for post.
+// @Summary Like post
+// @Description like existing post
 // @Tags Like
 // @Param id path string true "Post id"
 // @Param status path string true "status 0/1 (dislike or like)"
@@ -99,7 +99,7 @@ func LikePostController(ctx *gin.Context) {
 // GetListUserLikePost godoc
 // @Summary Get all User like based on blog post id.
 // @Description Get all users who likes comment in blog post based on id.
-// @Tags Post
+// @Tags Like
 // @Produce json
 // @Param id path string true "Post id"
 // @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
@@ -115,7 +115,7 @@ func GetListUserLikePost(ctx *gin.Context) {
 	listOfUsers := []models.UserResponse{}
 	for _, item := range userLikePost {
 		user := models.User{}
-		if err := db.Table("users").Where("id = ?", ctx.Param("id"), item.UserID).Find(&user).Error; err != nil {
+		if err := db.Table("users").Where("id = ?", item.UserID).Find(&user).Error; err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -126,7 +126,7 @@ func GetListUserLikePost(ctx *gin.Context) {
 			ImageUrl: user.ImageUrl,
 		})
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Success get all user like blog post", "data": listOfUsers})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Success get all user like comment blog post", "data": listOfUsers})
 }
 
 // GetListUserDislikePost godoc
@@ -148,7 +148,7 @@ func GetListUserDislikePost(ctx *gin.Context) {
 	listOfUsers := []models.UserResponse{}
 	for _, item := range userLikePost {
 		user := models.User{}
-		if err := db.Table("users").Where("id = ?", ctx.Param("id"), item.UserID).Find(&user).Error; err != nil {
+		if err := db.Table("users").Where("id = ?", item.UserID).Find(&user).Error; err != nil {
 			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
@@ -159,5 +159,5 @@ func GetListUserDislikePost(ctx *gin.Context) {
 			ImageUrl: user.ImageUrl,
 		})
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "Success get all user dislike blog post", "data": listOfUsers})
+	ctx.JSON(http.StatusOK, gin.H{"message": "Success get all user dislike comment blog post", "data": listOfUsers})
 }

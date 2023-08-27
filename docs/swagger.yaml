@@ -55,6 +55,7 @@ definitions:
       username:
         type: string
     required:
+    - email
     - name
     - password
     - role
@@ -510,7 +511,7 @@ paths:
       - Comment
   /post/{id}/like/{status}:
     post:
-      description: create new category for post.
+      description: like existing post
       parameters:
       - description: Post id
         in: path
@@ -535,7 +536,7 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Create Category
+      summary: Like post
       tags:
       - Like
   /post/{id}/user-dislikes:
@@ -587,7 +588,7 @@ paths:
             type: object
       summary: Get all User like based on blog post id.
       tags:
-      - Post
+      - Like
   /post/comment:
     post:
       description: create new comment blog post based on post id.
@@ -618,7 +619,7 @@ paths:
     post:
       description: like comment in existing post.
       parameters:
-      - description: LikeComment id
+      - description: Comment id
         in: path
         name: id
         required: true
@@ -648,7 +649,7 @@ paths:
     get:
       description: Get all users who dislikes comment in blog post based on id.
       parameters:
-      - description: Post id
+      - description: Comment id
         in: path
         name: id
         required: true
@@ -666,9 +667,9 @@ paths:
           schema:
             additionalProperties: true
             type: object
-      summary: Get all User dislike blog.
+      summary: Get all User dislike comment blog.
       tags:
-      - Comment
+      - Like
   /post/comment/{id}/user-likes:
     get:
       description: Get all users who likes comment in blog post based on id.
@@ -693,7 +694,7 @@ paths:
             type: object
       summary: Get all User likes based on comment blog post id.
       tags:
-      - Comment
+      - Like
   /user:
     get:
       description: Get all users that have been registered except current user.

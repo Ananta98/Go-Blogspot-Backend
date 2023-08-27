@@ -63,8 +63,8 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	//user like comment post api section
 	PostRoute.POST("/comment/:id/like/:status", controllers.LikeCommentController)
-	PostRoute.GET("/comment/:id/user-likes/", controllers.GetListUserLikePost)
-	PostRoute.GET("/comment/:id/user-dislikes/", controllers.GetListUserDislikePost)
+	PostRoute.GET("/comment/:id/user-likes/", controllers.GetListUserLikeComment)
+	PostRoute.GET("/comment/:id/user-dislikes/", controllers.GetListUserDislikeComment)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

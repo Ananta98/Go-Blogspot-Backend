@@ -437,7 +437,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "LikeComment id",
+                        "description": "Comment id",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -475,13 +475,13 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Comment"
+                    "Like"
                 ],
-                "summary": "Get all User dislike blog.",
+                "summary": "Get all User dislike comment blog.",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Post id",
+                        "description": "Comment id",
                         "name": "id",
                         "in": "path",
                         "required": true
@@ -512,7 +512,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Comment"
+                    "Like"
                 ],
                 "summary": "Get all User likes based on comment blog post id.",
                 "parameters": [
@@ -789,14 +789,14 @@ const docTemplate = `{
         },
         "/post/{id}/like/{status}": {
             "post": {
-                "description": "create new category for post.",
+                "description": "like existing post",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Like"
                 ],
-                "summary": "Create Category",
+                "summary": "Like post",
                 "parameters": [
                     {
                         "type": "string",
@@ -875,7 +875,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Post"
+                    "Like"
                 ],
                 "summary": "Get all User like based on blog post id.",
                 "parameters": [
@@ -1084,6 +1084,7 @@ const docTemplate = `{
         "controllers.RegisterInput": {
             "type": "object",
             "required": [
+                "email",
                 "name",
                 "password",
                 "role",
