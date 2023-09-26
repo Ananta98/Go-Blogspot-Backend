@@ -1,1 +1,1 @@
-# FP-Sanbercode-Go-48-Ananta
+Go Project Blog Backend Using Gin, Gorm, and MySQL 
